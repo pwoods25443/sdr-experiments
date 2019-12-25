@@ -35,4 +35,41 @@ If there are AIS messages to be received, they will be logged to the console and
 
 
 
+## Raspberry Pi Setup
+
+
+### Hardware
+* Raspberry Pi 4 Model B 4 GB Ram
+* RTL-SDR hardware (RTL2832U)
+
+ 
+### Install
+Instructions for OSX
+* Download the [SatNOGS Pi image](https://wiki.satnogs.org/Raspberry_Pi_3)
+* Use [The Unarchiver](Use The Unarchiver to 
+) to unpack the image zip file
+* Use [balenaEtcher](https://www.balena.io/etcher/) to create teh Pi boot image on an sd card
+* install the SD card and start up the Pi
+* Helpful hint: to set up networking on the PI without a monitor and keyboard, use the pre-boot configuration to set up a wifi connection so you can start up headless and ssh in
+See https://wiki.satnogs.org/Raspberry_Pi_3#Pre-boot_wireless_configuration
+* Download the SatNOGS Raspian Pi image from here http://xdeco.org/?page_id=30#ai2
+
+```buildoutcfg
+scp ~/Downloads/aisdeco2_rpi2-3_deb9_20180430.tgz pi@raspberrypi.local:~
+ssh pi@raspberrypi.local
+mkdir aisdeco2
+mv aisdeco2_rpi2-3_deb9_20180430.tgz aisdeco2
+cd aisdeco2
+tar xzf aisdeco2_rpi2-3_deb9_20180430.tgz 
+./aisdeco2 --device-list
+```
+
+If the RTL-SDR device is found you should see
+
+```buildoutcfg
+2019-12-25 17:24:30.584  INFO     AiSDeco2 v.20180430
+Available Devices:
+ 0: Generic RTL2832U OEM
+```
+
 
