@@ -6,6 +6,6 @@ Inspired by the [Open Source Ground Station Network](https://satnogs.org/)
 ### Planned Projects
 
 * SatNOGS ground station
-* AIS terrestrial reveiver 
+* AIS terrestrial receiver 
 
-
+[AIS Receiver](AIS-receiver.md)
