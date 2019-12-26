@@ -48,7 +48,7 @@ Instructions for OSX
 * Download the [SatNOGS Pi image](https://wiki.satnogs.org/Raspberry_Pi_3)
 * Use [The Unarchiver](Use The Unarchiver to 
 ) to unpack the image zip file
-* Use [balenaEtcher](https://www.balena.io/etcher/) to create teh Pi boot image on an sd card
+* Use [balenaEtcher](https://www.balena.io/etcher/) to create the Pi boot image on an sd card
 * install the SD card and start up the Pi
 * Helpful hint: to set up networking on the PI without a monitor and keyboard, use the pre-boot configuration to set up a wifi connection so you can start up headless and ssh in
 See https://wiki.satnogs.org/Raspberry_Pi_3#Pre-boot_wireless_configuration
@@ -71,5 +71,15 @@ If the RTL-SDR device is found you should see
 Available Devices:
  0: Generic RTL2832U OEM
 ```
+
+### Testing at Port Canveral 
+
+with aisdeco2 and OpenCPN running in Ubuntu on the MBP
+
+![RTL-SDR hardware (RTL2832U)](./img/IMG_20191224_120044.jpg)
+
+![The whole setup](./img/IMG_20191224_120032.jpg)
+
+![Vessels tracking in OpenCPN](./img/IMG_20191224_120039.jpg)
 
 
