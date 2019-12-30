@@ -133,3 +133,6 @@ dmypy.json
 
 #osx
 .DS_Store
+
+#virtualenv
+venv/
