@@ -46,3 +46,25 @@ In that case, you need to use the gcc compilier instead of the osx clang compile
 brew install gcc
 CC=gcc-9 CXX=g++-9 pip install libais
 ```
+
+
+### Install python 3 and pip on raspberry pi
+**NOTE probably don't need this after all**
+```buildoutcfg
+sudo apt install libffi-dev libbz2-dev liblzma-dev libsqlite3-dev libncurses5-dev libgdbm-dev \
+  zlib1g-dev libreadline-dev libssl-dev tk-dev build-essential libncursesw5-dev libc6-dev openssl git
+wget https://www.python.org/ftp/python/3.6.9/Python-3.6.9.tar.xz
+tar xf Python-3.6.9.tar.xz
+cd Python-3.6.9/
+./configure --enable-optimizations
+make -j -l 4
+sudo make altinstall
+sudo python3.6 get-pip.py
+curl -O https://bootstrap.pypa.io/get-pip.py
+```
+
+### AIS streaming with tagblock
+
+```buildoutcfg
+aisdeco2
+```

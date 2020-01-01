@@ -30,10 +30,29 @@ def add_tagblock(nmea, station):
     return '\\{}*{}\\{}'.format(param_str, checksum, nmea)
 
 
-@click.command()
+@click.command(
+    help="Utility for wrapping a stream of raw NMEA sentences, such as from the output of aisdeco2, "
+         "and prepending a tgblock."
+         "\n\n"
+         "INPUT should be a text stream with one NMEA message per line, and defaiults to stdin.  Use '-' to explicitly "
+         "use stdin"
+         "\n\n"
+         "OUTPUT is a text stream of the input NMEA with a tgbblock prepended, including fields containing the current "
+         "timestamp"
+         "\n\n"
+         "For example:"
+         "\n\n"
+         "$ echo '!AIVDM,1,1,,A,15NTES0P00J>tC4@@FOhMgvD0D0M,0*49' | python tagblock.py"
+         "\n\n"
+         "outputs something like"
+         "\n\n"
+         "\c:1577762601537,s:sdr-experiments,T:2019-12-30 22.23.21*5D\!AIVDM,1,1,,A,15NTES0P00J>tC4@@FOhMgvD0D0M,0*49"
+         )
 @click.argument('input',  type=click.File('r'), default='-')
 @click.argument('output', type=click.File('w'), default='-')
-@click.option('-s', '--station', default='sdr-experiments')
+@click.option('-s', '--station', default='sdr-experiments',
+              help="identifier for this receiving station.  Useful fr filtering when  ais feeds from "
+                   "multiple receivers are merged")
 def tagblock(input, output, station):
 
     while True:
