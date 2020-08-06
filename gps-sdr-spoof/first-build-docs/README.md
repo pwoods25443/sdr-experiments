@@ -41,8 +41,8 @@ Have to change the password the first time
 
 On the RPI
 ```console
-$ sudo apt-get update
-$ sudo apt-get -y install \
+sudo apt-get update
+sudo apt-get -y install \
                        git \
                        build-essential \
                        libusb-1.0-0-dev \
@@ -75,8 +75,12 @@ sudo ldconfig
 
 ### Test the HackrRF hardware
 Connect the HackerRF One to the PI and do this
+```console
+sudo hackrf_info
 ```
-$ sudo hackrf_info
+
+Should see something like this
+```
 hackrf_info version: git-e93d70e
 libhackrf version: git-e93d70e (0.5)
 Found HackRF
@@ -91,7 +95,7 @@ Part ID Number: 0xa000cb3c 0x0061435b
 Connect the GPS Clock to the HackRF and give it power.   Put the GPS antenna near a window and see that both LEDs are lit and steady.  Then do this to see that the HackRF is getting the 10MHz signal from the clock 
 
 ```
-$ sudo hackrf_debug --si5351c -n 0 -r
+sudo hackrf_debug --si5351c -n 0 -r
 ```
 Working
 ```
@@ -106,11 +110,13 @@ Not working
 #### Install gnu-radio
 
 ```console
-$ sudo apt-get install gnuradio \
+sudo apt-get install gnuradio \
                        gnuradio-dev \
                        gr-iqbal \
                        gqrx-sdr
-$ volk_profile
+
+# run volk_profile 
+volk_profile
 ```
 
 #### Install gr-osmosdr
@@ -147,7 +153,7 @@ export PATH="/home/ubuntu/sdr/gps-sdr-sim:$PATH"
 - Goal: cause a gps (android smart phone, Pixel 3) to set a false, fixed location
 
 Make a working dir
-```
+```console
 cd ~/sdr
 mkdir static-test
 cd static-test
