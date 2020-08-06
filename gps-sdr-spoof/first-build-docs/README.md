@@ -16,7 +16,7 @@
 ![Hardware Configuration](IMG_20200805_065738.jpg)
 
 #### Set up the Raspberry Pi
-- Download image for [64-bit Ubuntu 8.04 for RPI 4](https://ubuntu.com/download/raspberry-pi)
+- Download image for [64-bit Ubuntu 18.04 LTS for RPI 4](https://ubuntu.com/download/raspberry-pi)
 - [Flash the image to SD Card](https://ubuntu.com/tutorials/create-an-ubuntu-image-for-a-raspberry-pi-on-macos#1-overview)
 
 ```sudo sh -c 'gunzip -c  ~/Downloads/ubuntu-18.04.4-preinstalled-server-arm64+raspi3.img.xz | sudo dd of=/dev/disk2 bs=32m'```
@@ -88,7 +88,7 @@ Part ID Number: 0xa000cb3c 0x0061435b
 ```
 
 ### Test the GPS Clock
-Connect the GPS Clock to the HackRF and give it power.   Put the GPS antenna near a window and see that both LEDs are lit and steady.  Then do this to see that the HackRF is getting teh 10MHz signal from the clock 
+Connect the GPS Clock to the HackRF and give it power.   Put the GPS antenna near a window and see that both LEDs are lit and steady.  Then do this to see that the HackRF is getting the 10MHz signal from the clock 
 
 ```
 $ sudo hackrf_debug --si5351c -n 0 -r
@@ -106,16 +106,16 @@ Not working
 #### Install gnu-radio
 
 ```console
-sudo apt-get install gnuradio \
+$ sudo apt-get install gnuradio \
                        gnuradio-dev \
                        gr-iqbal \
                        gqrx-sdr
-volk_profile
+$ volk_profile
 ```
 
 #### Install gr-osmosdr
 
-Installing v0.1.5 because the latest v0.2.0 requires a newer version of cmake which makes it incompatible with teh version of gnu-radio that is installed with apt.   Rather than build gnu-radio, just roll back to the earlier version of gr-osmosdr
+Installing v0.1.5 because the latest v0.2.0 requires a newer version of cmake which makes it incompatible with the version of gnu-radio that is installed with apt.   Rather than build gnu-radio, just roll back to the earlier version of gr-osmosdr
 ```console
 cd ~/sdr
 git clone https://github.com/osmocom/gr-osmosdr.git --branch v0.1.5
@@ -153,8 +153,8 @@ mkdir static-test
 cd static-test
 ```
 
-Download latest daily GPS broadcast ephemers file (brdc) via anonymous ftp
-File format is /gps/data/daily/YYYY/brdc/brdcDDD0.YYn.Z
+Download latest daily GPS broadcast ephemers file (brdc) via anonymous ftp. 
+File format is `/gps/data/daily/YYYY/brdc/brdcDDD0.YYn.Z`
 where 
 - YYYY is the 4-digit year
 - YY is the 2-digit year  
