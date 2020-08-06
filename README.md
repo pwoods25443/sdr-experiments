@@ -8,7 +8,7 @@ Inspired by the [Open Source Ground Station Network](https://satnogs.org/)
 * SatNOGS ground station
 * AIS terrestrial receiver
 * AIS transmitter
-* GPS sim testbed 
+* [GPS sim testbed](gps-sdr-spoof/README.md) 
 
 [AIS Receiver](AIS-receiver.md)
 
