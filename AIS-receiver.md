@@ -46,8 +46,7 @@ If there are AIS messages to be received, they will be logged to the console and
 ### Install
 Instructions for OSX
 * Download the [SatNOGS Pi image](https://wiki.satnogs.org/Raspberry_Pi_3)
-* Use [The Unarchiver](Use The Unarchiver to 
-) to unpack the image zip file
+* Use [The Unarchiver](https://theunarchiver.com/) to unpack the image zip file
 * Use [balenaEtcher](https://www.balena.io/etcher/) to create the Pi boot image on an sd card
 * install the SD card and start up the Pi
 * Helpful hint: to set up networking on the PI without a monitor and keyboard, use the pre-boot configuration to set up a wifi connection so you can start up headless and ssh in
@@ -83,3 +82,29 @@ with aisdeco2 and OpenCPN running in Ubuntu on the MBP
 ![Vessels tracking in OpenCPN](./img/IMG_20191224_120039.jpg)
 
 
+### Operation
+#### Running the ais receiver in a terminal
+```buildoutcfg
+ssh pi@rpiais.local
+# test to make sure the RTL-SDR device is connected
+aisdeco2/aisdeco2 --device-list
+```
+
+Should see 
+```
+2020-08-02 14:55:56.296  INFO     AiSDeco2 v.20180430
+Available Devices:
+ 0: Generic RTL2832U OEM
+```
+
+Output AIS to stdout
+```buildoutcfg
+./aisdeco2 --udp 192.168.2.3:4123 --agc
+```
+
+other stuff
+
+sudo systemctl start signalk.socket
+ nc -i 1 -u 192.168.2.3 4123 < port-canaveral-2019-12-29.nmea
+
+```

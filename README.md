@@ -6,7 +6,9 @@ Inspired by the [Open Source Ground Station Network](https://satnogs.org/)
 ### Planned Projects
 
 * SatNOGS ground station
-* AIS terrestrial receiver 
+* AIS terrestrial receiver
+* AIS transmitter
+* GPS sim testbed 
 
 [AIS Receiver](AIS-receiver.md)
 
