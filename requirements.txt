@@ -1,3 +1,3 @@
 Click==7.0
 libais
-gpxpi
+gpxpy
