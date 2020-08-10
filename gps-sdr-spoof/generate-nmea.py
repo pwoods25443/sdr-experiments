@@ -1,9 +1,4 @@
-import click
-from shapely.geometry import Point
-import gpxpy
-import gpxpy.gpx
 from gpxpy.gpx import GPXTrackPoint
-from gpxpy.gpx import GPXTrackSegment
 from gpxpy.geo import LocationDelta
 import copy
 import operator
