@@ -185,7 +185,7 @@ default duration is 300 seconds
 gps-sdr-sim -b 8 -e brdc2180.20n -l 37.925669,-122.732930,100
 ```
 
-Run the broadcast.  This will broadcast the spoofed gps signal. To get my phone to respond, I need to power it  on while the broadcast is running.  MIght also work if I start it up in airplane mode with location services turned off and then turn on location services while the broadcast is running
+Run the broadcast.  This will broadcast the spoofed gps signal. To get my phone (Pixel 3) to respond, I need to power it  on while the broadcast is running.  Might also work if I start it up in airplane mode with location services turned off and then turn on location services while the broadcast is running
 
 
 ```console
