@@ -1,8 +1,10 @@
 from gpxpy.gpx import GPXTrackPoint
+from gpxpy.gpx import GPXTrackSegment
 from gpxpy.geo import LocationDelta
 import copy
 import operator
 from math import floor
+import math
 from datetime import datetime
 from datetime import timedelta
 from functools import reduce
@@ -49,7 +51,7 @@ def generate_gga(time: "datetime",
                  latitude: "Float",
                  longitude: "Float",
                  elevation: "Float"
-                ):
+                 ):
     """
     Generate a single GGA NMEA sentence
     """
@@ -97,18 +99,18 @@ def gpx2nmea(p: "GPXTrackPoint"):
     return generate_gga(time=p.time, latitude=p.latitude, longitude=p.longitude, elevation=p.elevation)
 
 
-def interpolate_track_points(p1: "GPXTrackPoint", p2: "GPXTrackPoint", start_time: "datetime", speed: "Float", interval: "Float"):
-    """interpolate a path from p1 to p2, moving at speed (knots) with a position every interval seconds"""
+def interpolate_line(p1: "GPXTrackPoint", p2: "GPXTrackPoint", start_time: "datetime", speed_m: "Float", interval_s: "Float"):
+    """interpolate points on a line from p1 to p2, moving at speed (knots) with a position every interval seconds"""
     total_distance = p1.distance_2d(p2)
-    time_delta = timedelta(seconds=interval)
-    dist_delta = speed * KNOTS_TO_METERS_PER_SECOND * interval
+    time_delta = timedelta(seconds=interval_s)
+    dist_delta = speed_m * interval_s
     location_delta = LocationDelta(dist_delta, p1.course_between(p2))
     steps = int(round(total_distance / dist_delta))
     p = GPXTrackPoint(latitude=p1.latitude,
                       longitude=p1.longitude,
                       elevation=p1.elevation,
                       time=start_time,
-                      speed=speed)
+                      speed=speed_m)
     for i in range(0, steps + 1):
         next_p = copy.deepcopy(p)
         next_p.move(location_delta)
@@ -117,10 +119,70 @@ def interpolate_track_points(p1: "GPXTrackPoint", p2: "GPXTrackPoint", start_tim
         p = next_p
 
 
+def test_interpolate_line():
+    p1 = GPXTrackPoint(0, 0)
+    p2 = GPXTrackPoint(1, 0)
+    start_time = datetime(2020, 1, 1, 0, 0, 0)
+    speed_m = 60 * KNOTS_TO_METERS_PER_SECOND
+    interval_s = 600
+    # at 60 knots you go 60 NM or 1 degree in 1 hour
+    points = list(interpolate_line(p1=p1, p2=p2, start_time=start_time, speed_m=speed_m, interval_s=interval_s))
+    seg = GPXTrackSegment(points)
+    assert (seg.get_points_no() == 7)
+    assert (seg.get_duration() == 3600)
+    assert (math.isclose(seg.length_2d(), 111000, rel_tol=0.01))
+
+
+def interpolate_circle(center_point: "GPXTrackPoint", radius_m: "Float", total_dist_m: "Float", start_time: "datetime",
+                       speed_m: "Float", interval_s: "Float"):
+    """Interpolate points on a circular path.  Go around the circle repeatedly until total_dist_m is reached"""
+    circumference = math.pi * radius_m * 2
+    time_delta = timedelta(seconds=interval_s)
+    dist_delta = speed_m * interval_s
+    angle_delta = math.degrees(dist_delta / circumference * 2 * math.pi)
+
+    angle = 0.0
+    dist = 0.0
+    time = start_time
+    p = GPXTrackPoint(latitude=center_point.latitude,
+                      longitude=center_point.longitude,
+                      elevation=center_point.elevation,
+                      time=start_time,
+                      speed=speed_m)
+    while dist <= total_dist_m:
+        next_p = copy.deepcopy(p)
+        next_p.move(LocationDelta(distance=radius_m, angle=angle))
+        next_p.time = time
+        yield next_p
+        dist += dist_delta
+        angle += angle_delta
+        time += time_delta
+
+
+def test_interpolate_circle ():
+    center_point = GPXTrackPoint(1, 1)
+    radius_m = 500
+    total_dist_m = 2 * math.pi * radius_m
+    start_time = datetime(2020, 1, 1, 0, 0, 0)
+    speed_m = math.pi * 10
+    interval_s = 10
+    points = interpolate_circle(center_point=center_point, radius_m=radius_m, total_dist_m=total_dist_m,
+                                start_time=start_time, speed_m=speed_m, interval_s=interval_s)
+    seg = GPXTrackSegment(list(points))
+    assert (seg.get_points_no() == 11)
+    assert (seg.get_duration() == 100)
+    assert (math.isclose(seg.length_2d(), total_dist_m, rel_tol=0.05))
+
+
 def generate_nmea():
-    points = interpolate_track_points(GPXTrackPoint(0, 0), GPXTrackPoint(0.01, 0), datetime.utcnow(), 10, 0.1)
+    # points = interpolate_line(GPXTrackPoint(0, 0), GPXTrackPoint(0.01, 0), datetime.utcnow(), 10 * KNOTS_TO_METERS_PER_SECOND, 0.1)
+    points = interpolate_circle(center_point=GPXTrackPoint(1, 1),
+                                radius_m=100,
+                                total_dist_m=math.pi * 400,
+                                start_time=datetime.utcnow(),
+                                speed_m=10 * KNOTS_TO_METERS_PER_SECOND,
+                                interval_s=0.1)
     for p in points:
-        # print(p)
         print(gpx2nmea(p))
 
 
