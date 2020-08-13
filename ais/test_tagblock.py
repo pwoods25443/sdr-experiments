@@ -4,6 +4,7 @@ from click.testing import CliRunner
 from tagblock import tagblock
 from tagblock import add_tagblock
 from tagblock import format_tagblock_t
+from tagblock import extract_nmea
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -22,10 +23,10 @@ class TestTagblockCli(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(tagblock, input="\n".join(NMEA))
         self.assertFalse(result.exception)
-        output = result.output.split('\n')
+        output = result.output.split('\n')[:-1]
         self.assertEqual(len(output), len(NMEA))
         for item_in, item_out in zip(NMEA, output):
-            self.assertTrue (len(item_in) < len(item_out))
+            self.assertTrue(len(item_in) < len(item_out))
             self.assertTrue(item_out.endswith(item_in))
 
     # make sure that our sample nmea messages parse correctly
@@ -44,6 +45,11 @@ class TestTagblockCli(unittest.TestCase):
             # self.assertEqual(tagblock, '')
             c = format_tagblock_t(datetime.fromtimestamp(tagblock['tagblock_timestamp']))
             self.assertEqual(c, tagblock['tagblock_T'])
+
+    def test_extract_nmea(self):
+        for sentence in NMEA:
+            nmea = extract_nmea("extra {}text".format(sentence))
+            assert nmea == sentence
 
 
 if __name__ == '__main__':
