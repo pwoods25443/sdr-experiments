@@ -1,10 +1,9 @@
 import click
-import sys
 from datetime import datetime
 import re
 
 #  \g:1-2-73874,n:157036,s:r003669945,c:1241544035*4A\
-TAGBLOCK_T_FORMAT='%Y-%m-%d %H.%M.%S'
+TAGBLOCK_T_FORMAT = '%Y-%m-%d %H.%M.%S'
 
 
 def format_tagblock_t(dt):
@@ -33,7 +32,7 @@ def add_tagblock(nmea, station):
 
 
 def extract_nmea(line):
-    match = re.search('(!AIVDM[^*]*\*[0-9a-fA-F]{2})', line)
+    match = re.search('(!AIVDM[^*]*\\*[0-9a-fA-F]{2})', line)
     return match.group(0) if match is not None else None
 
 
