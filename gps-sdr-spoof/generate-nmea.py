@@ -1,13 +1,16 @@
-from gpxpy.gpx import GPXTrackPoint
-from gpxpy.gpx import GPXTrackSegment
-from gpxpy.geo import LocationDelta
+import click
+
 import copy
 import operator
-from math import floor
 import math
+from math import floor
 from datetime import datetime
 from datetime import timedelta
 from functools import reduce
+
+from gpxpy.gpx import GPXTrackPoint
+from gpxpy.gpx import GPXTrackSegment
+from gpxpy.geo import LocationDelta
 
 KNOTS_TO_METERS_PER_SECOND = 0.514444
 
@@ -17,9 +20,9 @@ def nmea_checksum(sentence):
     Compute the checksum for an NMEA sentence
 
     The sentence may optionally start with a "$" which is ignored and
-    may or may not have  a checksum at the end separate by "*"
+    may or may not have  a checksum at the end separated by "*"
 
-    The return is a tuple containing the data portion of the sentence which is used to compute teh checksum,
+    The return is a tuple containing the data portion of the sentence which is used to compute the checksum,
     the value of the checksum, if any, that was passed at the end of the sentence and the
     checksum value that is calculated using the data portion of the sentence
     """
@@ -42,7 +45,7 @@ def test_nmea_checksum():
              ]
 
     for sentence, expected_checksum, expected_calc_checksum in tests:
-        data, checksum, calc_checksum  = nmea_checksum(sentence)
+        data, checksum, calc_checksum = nmea_checksum(sentence)
         assert (checksum == expected_checksum)
         assert (calc_checksum == expected_calc_checksum)
 
@@ -99,8 +102,13 @@ def gpx2nmea(p: "GPXTrackPoint"):
     return generate_gga(time=p.time, latitude=p.latitude, longitude=p.longitude, elevation=p.elevation)
 
 
-def interpolate_line(p1: "GPXTrackPoint", p2: "GPXTrackPoint", start_time: "datetime", speed_m: "Float", interval_s: "Float"):
-    """interpolate points on a line from p1 to p2, moving at speed (knots) with a position every interval seconds"""
+def interpolate_line(p1: "GPXTrackPoint", p2: "GPXTrackPoint",
+                     start_time: "datetime", speed_m: "Float",
+                     interval_s: "Float"):
+    """
+    interpolate points on a line from p1 to p2, moving at speed (meters/sec)
+    with a position every interval seconds
+    """
     total_distance = p1.distance_2d(p2)
     time_delta = timedelta(seconds=interval_s)
     dist_delta = speed_m * interval_s
@@ -133,8 +141,8 @@ def test_interpolate_line():
     assert (math.isclose(seg.length_2d(), 111000, rel_tol=0.01))
 
 
-def interpolate_circle(center_point: "GPXTrackPoint", radius_m: "Float", total_dist_m: "Float", start_time: "datetime",
-                       speed_m: "Float", interval_s: "Float"):
+def interpolate_circle(center_point: "GPXTrackPoint", radius_m: "Float", total_dist_m: "Float",
+                       start_time: "datetime", speed_m: "Float", interval_s: "Float"):
     """Interpolate points on a circular path.  Go around the circle repeatedly until total_dist_m is reached"""
     circumference = math.pi * radius_m * 2
     time_delta = timedelta(seconds=interval_s)
@@ -174,17 +182,55 @@ def test_interpolate_circle ():
     assert (math.isclose(seg.length_2d(), total_dist_m, rel_tol=0.05))
 
 
-def generate_nmea():
-    # points = interpolate_line(GPXTrackPoint(0, 0), GPXTrackPoint(0.01, 0), datetime.utcnow(), 10 * KNOTS_TO_METERS_PER_SECOND, 0.1)
-    points = interpolate_circle(center_point=GPXTrackPoint(1, 1),
-                                radius_m=100,
-                                total_dist_m=math.pi * 400,
-                                start_time=datetime.utcnow(),
-                                speed_m=10 * KNOTS_TO_METERS_PER_SECOND,
-                                interval_s=0.1)
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.argument('lat1', type=click.FLOAT)
+@click.argument('lon1', type=click.FLOAT)
+@click.argument('lat2', type=click.FLOAT)
+@click.argument('lon2', type=click.FLOAT)
+@click.option('--speed-kn', '-s', type=click.FLOAT, default=10, show_default="10 knots")
+@click.option('--interval_s', '-i', type=click.FLOAT, default=0.1, show_default="0.1 seconds")
+@click.option('--start-time', '-t',
+              type=click.DateTime(formats=['%H:%M:%S']),
+              default=datetime.utcnow().strftime('%H:%M:%S'),
+              show_default="now")
+def line(lat1, lon1, lat2, lon2, speed_kn, interval_s, start_time):
+    points = interpolate_line(
+        p1=GPXTrackPoint(latitude=lat1, longitude=lon1),
+        p2=GPXTrackPoint(latitude=lat2, longitude=lon2),
+        start_time=start_time,
+        speed_m=speed_kn * KNOTS_TO_METERS_PER_SECOND,
+        interval_s=interval_s)
+    for p in points:
+        print(gpx2nmea(p))
+
+
+@cli.command()
+@click.argument('latitude', type=click.FLOAT)
+@click.argument('longitude', type=click.FLOAT)
+@click.option('--radius-m', '-r', type=click.FLOAT, default=100.0, show_default="100 meters")
+@click.option('--total-dist-m', '-d', type=click.FLOAT, default=1000.0, show_default="1000 meters")
+@click.option('--speed-kn', '-s', type=click.FLOAT, default=10, show_default="10 knots")
+@click.option('--interval_s', '-i', type=click.FLOAT, default=0.1, show_default="0.1 seconds")
+@click.option('--start-time', '-t',
+              type=click.DateTime(formats=['%H:%M:%S']),
+              default=datetime.utcnow().strftime('%H:%M:%S'),
+              show_default="now")
+def circle(latitude, longitude, radius_m, total_dist_m, speed_kn, start_time, interval_s):
+    points = interpolate_circle(
+        center_point=GPXTrackPoint(latitude=latitude, longitude=longitude),
+        radius_m=radius_m,
+        total_dist_m=total_dist_m,
+        start_time=start_time,
+        speed_m=speed_kn * KNOTS_TO_METERS_PER_SECOND,
+        interval_s=interval_s)
     for p in points:
         print(gpx2nmea(p))
 
 
 if __name__ == '__main__':
-    generate_nmea()
+    cli()
